@@ -112,6 +112,8 @@ pub struct Processor<'a> {
     macros: MacroCollection<'a>,
     /// If set, rendering should be escaped
     should_escape: bool,
+    /// If set, rendering ignores identifiers not defined within context
+    should_ignore_undefined: bool,
     /// Used when super() is used in a block, to know where we are in our stack of
     /// definitions and for which block
     /// Vec<(block name, tpl_name, level)>
@@ -125,6 +127,7 @@ impl<'a> Processor<'a> {
         tera: &'a Tera,
         context: &'a Context,
         should_escape: bool,
+        should_ignore_undefined: bool,
     ) -> Self {
         // Gets the root template if we are rendering something with inheritance or just return
         // the template we're dealing with otherwise
@@ -143,6 +146,7 @@ impl<'a> Processor<'a> {
             call_stack,
             macros: MacroCollection::from_original_template(&template, &tera),
             should_escape,
+            should_ignore_undefined,
             blocks: Vec::new(),
         }
     }
@@ -390,6 +394,8 @@ impl<'a> Processor<'a> {
                     Err(e) => {
                         if expr.has_default_filter() {
                             self.get_default_value(expr)?
+                        } else if self.should_ignore_undefined {
+                            Cow::Owned(Value::String("".into()))
                         } else {
                             if !expr.negated {
                                 return Err(e);

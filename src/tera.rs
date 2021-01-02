@@ -42,6 +42,8 @@ pub struct Tera {
     pub autoescape_suffixes: Vec<&'static str>,
     #[doc(hidden)]
     escape_fn: EscapeFn,
+    #[doc(hidden)]
+    pub ignore_undefined: bool,
 }
 
 impl Tera {
@@ -61,6 +63,7 @@ impl Tera {
             testers: HashMap::new(),
             autoescape_suffixes: vec![".html", ".htm", ".xml"],
             escape_fn: escape_html,
+            ignore_undefined: false,
         };
 
         tera.load_from_glob()?;
@@ -754,6 +757,7 @@ impl Default for Tera {
             functions: HashMap::new(),
             autoescape_suffixes: vec![".html", ".htm", ".xml"],
             escape_fn: escape_html,
+            ignore_undefined: false,
         };
 
         tera.register_tera_filters();
