@@ -42,8 +42,8 @@ pretty_assertions = "0.6"
 tempfile = "3"
 
 [features]
-default = ["builtins", "globs"]
-builtins = ["slug", "percent-encoding", "humansize", "chrono", "chrono-tz", "unic-segment", "rand"]
+default = ["builtins", "globs", "rand"]
+builtins = ["slug", "percent-encoding", "humansize", "chrono", "chrono-tz", "unic-segment"]
 preserve_order = ["serde_json/preserve_order"]
 globs = ["globwalk"]
 

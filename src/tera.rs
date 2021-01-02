@@ -596,7 +596,7 @@ impl Tera {
         #[cfg(feature = "builtins")]
         self.register_function("now", functions::now);
         self.register_function("throw", functions::throw);
-        #[cfg(feature = "builtins")]
+        #[cfg(feature = "rand")]
         self.register_function("get_random", functions::get_random);
         self.register_function("get_env", functions::get_env);
     }
