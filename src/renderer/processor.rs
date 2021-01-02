@@ -971,7 +971,16 @@ impl<'a> Processor<'a> {
             // Macros have been imported at the beginning
             Node::ImportMacro(_, _, _) => (),
             Node::If(ref if_node, _) => self.render_if_node(if_node, write)?,
-            Node::Forloop(_, ref forloop, _) => self.render_for_loop(forloop, write)?,
+            Node::Forloop(_, ref forloop, _) => {
+                match self.render_for_loop(forloop, write) {
+                    Ok(result) => (),
+                    Err(e) => {
+                        if !self.should_ignore_undefined {
+                            return Err(e);
+                        }
+                    }
+                }
+            },
             Node::Break(_) => {
                 self.call_stack.break_for_loop()?;
             }
