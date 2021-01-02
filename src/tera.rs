@@ -127,7 +127,17 @@ impl Tera {
             .map(|(n, t)| (n.clone(), t.clone())) // TODO: avoid that clone
             .collect();
 
-        #[cfg(feature = "globs")]
+        let mut errors = String::new();
+
+        let dir = self.glob.clone().unwrap();
+        // We clean the filename by removing the dir given
+        // to Tera so users don't have to prefix everytime
+        let mut parent_dir = dir.split_at(dir.find('*').unwrap()).0;
+        // Remove `./` from the glob if used as it would cause an error in strip_prefix
+        if parent_dir.starts_with("./") {
+            parent_dir = &parent_dir[2..];
+        }
+
         // We are parsing all the templates on instantiation
         for entry in glob_builder(&dir)
             .follow_links(true)
@@ -142,29 +152,28 @@ impl Tera {
                     path = path.strip_prefix("./").unwrap().to_path_buf();
                 }
 
-                    let filepath = path
-                        .strip_prefix(&parent_dir)
-                        .unwrap()
-                        .to_string_lossy()
-                        // unify on forward slash
-                        .replace("\\", "/");
+                let filepath = path
+                    .strip_prefix(&parent_dir)
+                    .unwrap()
+                    .to_string_lossy()
+                    // unify on forward slash
+                    .replace("\\", "/");
 
-                    if let Err(e) = self.add_file(Some(&filepath), path) {
-                        use std::error::Error;
+                if let Err(e) = self.add_file(Some(&filepath), path) {
+                    use std::error::Error;
 
-                        errors += &format!("\n* {}", e);
-                        let mut cause = e.source();
-                        while let Some(e) = cause {
-                            errors += &format!("\n{}", e);
-                            cause = e.source();
-                        }
+                    errors += &format!("\n* {}", e);
+                    let mut cause = e.source();
+                    while let Some(e) = cause {
+                        errors += &format!("\n{}", e);
+                        cause = e.source();
                     }
                 }
             }
+        }
 
-            if !errors.is_empty() {
-                return Err(Error::msg(errors));
-            }
+        if !errors.is_empty() {
+            return Err(Error::msg(errors));
         }
 
         Ok(())
@@ -637,7 +646,7 @@ impl Tera {
         #[cfg(feature = "builtins")]
         self.register_function("now", functions::now);
         self.register_function("throw", functions::throw);
-        #[cfg(feature = "builtins")]
+        #[cfg(feature = "rand")]
         self.register_function("get_random", functions::get_random);
         self.register_function("get_env", functions::get_env);
     }
