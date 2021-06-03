@@ -44,7 +44,13 @@ impl<'a> Renderer<'a> {
             template.name.ends_with(ext)
         });
 
-        Renderer { template, tera, context, should_escape, should_ignore_undefined: tera.ignore_undefined }
+        Renderer {
+            template,
+            tera,
+            context,
+            should_escape,
+            should_ignore_undefined: tera.ignore_undefined,
+        }
     }
 
     /// Combines the context with the Template to generate the end result
@@ -56,8 +62,13 @@ impl<'a> Renderer<'a> {
 
     /// Combines the context with the Template to write the end result to output
     pub fn render_to(&self, mut output: impl Write) -> Result<()> {
-        let mut processor =
-            Processor::new(self.template, self.tera, &self.context, self.should_escape, self.should_ignore_undefined);
+        let mut processor = Processor::new(
+            self.template,
+            self.tera,
+            &self.context,
+            self.should_escape,
+            self.should_ignore_undefined,
+        );
 
         processor.render(&mut output)
     }
