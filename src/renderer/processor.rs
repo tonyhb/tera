@@ -973,7 +973,7 @@ impl<'a> Processor<'a> {
             Node::If(ref if_node, _) => self.render_if_node(if_node, write)?,
             Node::Forloop(_, ref forloop, _) => {
                 match self.render_for_loop(forloop, write) {
-                    Ok(result) => (),
+                    Ok(_result) => (),
                     Err(e) => {
                         if !self.should_ignore_undefined {
                             return Err(e);
